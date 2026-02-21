@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jurnal Ramadhan Cilik</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Nunito', sans-serif; }
+    .title-font { font-family: 'Bubblegum Sans', cursive; }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    
+    @keyframes bounce-in {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    @keyframes slide-up {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .float-animation { animation: float 3s ease-in-out infinite; }
+    .twinkle { animation: twinkle 2s ease-in-out infinite; }
+    .bounce-in { animation: bounce-in 0.5s ease-out forwards; }
+    .slide-up { animation: slide-up 0.4s ease-out forwards; }
+    .shake { animation: shake 0.3s ease-in-out; }
+    
+    .star {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #FFD700;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+    
+    .activity-chip {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      padding: 12px 16px;
+      border-radius: 20px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      font-weight: 500;
+    }
+    
+    .activity-chip:hover {
+      transform: translateY(-2px);
+      border-color: #9333ea;
+    }
+    
+    .activity-chip.selected {
+      background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+      color: white;
+      border-color: #9333ea;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(147, 51, 234, 0.4);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(107, 114, 128, 0.4);
+    }
+    
+    .mosque-bg {
+      background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+    }
+    
+    .photo-upload-area {
+      border: 3px dashed #9333ea;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .photo-upload-area:hover {
+      background: rgba(147, 51, 234, 0.05);
+      border-color: #7c3aed;
+    }
+    
+    .photo-upload-area.drag-over {
+      background: rgba(147, 51, 234, 0.15);
+      border-color: #7c3aed;
+      transform: scale(1.02);
+    }
+    
+    .progress-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .progress-step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      background: #9333ea;
+      transition: all 0.3s ease;
+    }
+    
+    .progress-step.completed .progress-step-number {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .progress-step.active .progress-step-number {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(147, 51, 234, 0.4);
+    }
+    
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50px;
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full overflow-auto">
+  <div id="app" class="min-h-full w-full"><!-- Page 1: Login Screen -->
+   <div id="page-login" class="min-h-full w-full mosque-bg relative overflow-hidden hidden-page">
+    <div class="absolute inset-0 pointer-events-none">
+     <div class="star twinkle" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+     <div class="star twinkle" style="top: 15%; left: 80%; animation-delay: 0.3s;"></div>
+     <div class="star twinkle" style="top: 25%; left: 45%; animation-delay: 0.6s;"></div>
+     <div class="star twinkle" style="top: 8%; left: 60%; animation-delay: 0.9s;"></div>
+     <div class="star twinkle" style="top: 20%; left: 25%; animation-delay: 1.2s;"></div>
+     <div class="star twinkle" style="top: 12%; left: 90%; animation-delay: 0.4s;"></div>
+     <div class="cloud" style="top: 30%; left: -5%; width: 100px; height: 40px;"></div>
+     <div class="cloud" style="top: 20%; right: -3%; width: 80px; height: 35px;"></div>
+    </div>
+    <div class="absolute top-8 right-8 w-20 h-20 bg-yellow-200 rounded-full shadow-lg float-animation" style="box-shadow: 0 0 40px rgba(253, 224, 71, 0.6);">
+     <div class="absolute top-2 right-2 w-16 h-16 bg-gradient-to-br from-yellow-100 to-yellow-300 rounded-full"></div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-40">
+     <svg viewbox="0 0 400 100" class="w-full h-full" preserveaspectratio="none"><path d="M0,100 L0,60 Q20,60 20,50 Q20,30 40,30 Q60,30 60,50 Q60,60 80,60 L80,40 Q100,40 100,25 Q100,10 120,10 Q140,10 140,25 Q140,40 160,40 L160,60 Q180,60 180,50 Q180,30 200,30 Q220,30 220,50 Q220,60 240,60 L240,100 Z" fill="#0f172a" /> <path d="M240,100 L240,55 Q260,55 260,45 Q260,25 280,25 Q300,25 300,45 Q300,55 320,55 L320,35 Q340,35 340,20 Q340,5 360,5 Q380,5 380,20 Q380,35 400,35 L400,100 Z" fill="#0f172a" />
+     </svg>
+    </div>
+    <div class="relative z-10 flex flex-col items-center justify-center min-h-full px-4 py-12">
+     <div class="text-center mb-8 bounce-in">
+      <div class="text-6xl mb-4">
+       🌙
+      </div>
+      <h1 id="app-title" class="title-font text-4xl md:text-5xl text-yellow-300 drop-shadow-lg mb-2">Jurnal Ramadhan Cilik</h1>
+      <p id="welcome-msg" class="text-white/80 text-lg">Selamat datang di Jurnal Ramadhan!</p>
+     </div>
+     <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-8 w-full max-w-md shadow-2xl slide-up" style="animation-delay: 0.2s;">
+      <div class="text-center mb-6">
+       <div class="text-5xl mb-3">
+        👋
+       </div>
+       <h2 class="text-2xl font-bold text-purple-700">Halo, Sobat Muslim!</h2>
+       <p class="text-gray-600 mt-2">Masukkan namamu untuk mulai mencatat kegiatan Ramadhan</p>
+      </div>
+      <form id="login-form" class="space-y-4">
+       <div><label for="student-name" class="block text-sm font-semibold text-gray-700 mb-2">📝 Nama Lengkap</label> <input type="text" id="student-name" placeholder="Contoh: Ahmad Fajar" class="w-full px-4 py-3 rounded-xl border-2 border-purple-200 focus:border-purple-500 focus:outline-none text-lg transition-all" required>
+       </div><button type="submit" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg">🚀 Mulai Petualangan!</button>
+      </form>
+     </div>
+     <p class="text-white/60 text-sm mt-6 text-center">✨ Kumpulkan bintang dengan menyelesaikan kegiatan Ramadhan!</p>
+    </div>
+   </div><!-- Page 2: Rules Screen -->
+   <div id="page-rules" class="min-h-full w-full hidden-page" style="background: linear-gradient(180deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);">
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 shadow-lg sticky top-0 z-20">
+     <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3"><button id="back-from-rules" class="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg></button>
+       <div>
+        <h1 class="title-font text-2xl">Panduan Pengisian</h1>
+       </div>
+      </div><button id="logout-btn-rules" class="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+       </svg></button>
+     </div>
+    </header>
+    <div class="max-w-2xl mx-auto px-4 py-8">
+     <div class="bg-white rounded-3xl p-8 shadow-xl mb-8 slide-up">
+      <div class="text-center mb-8">
+       <div class="text-6xl mb-4">
+        📋
+       </div>
+       <h2 class="text-3xl font-bold text-purple-700">Aturan Pengisian Jurnal</h2>
+      </div>
+      <div class="space-y-6">
+       <div class="flex gap-4 items-start">
+        <div class="text-4xl">
+         ✅
+        </div>
+        <div>
+         <h3 class="text-xl font-bold text-gray-800 mb-2">Isi Sesuai Kenyataan</h3>
+         <p class="text-gray-600">Catatlah kegiatan Ramadhan yang benar-benar kamu lakukan. Jangan membuat cerita atau menambah-nambah. Kejujuran adalah amanah!</p>
+        </div>
+       </div>
+       <div class="flex gap-4 items-start">
+        <div class="text-4xl">
+         📅
+        </div>
+        <div>
+         <h3 class="text-xl font-bold text-gray-800 mb-2">Usahakan Isi Setiap Hari</h3>
+         <p class="text-gray-600">Konsistensi adalah kunci! Isi jurnal setiap hari agar tidak lupa dan tercipta kebiasaan baik. Jangan tunda-tunda, ya!</p>
+        </div>
+       </div>
+       <div class="flex gap-4 items-start">
+        <div class="text-4xl">
+         💭
+        </div>
+        <div>
+         <h3 class="text-xl font-bold text-gray-800 mb-2">Berikan Keterangan Detail</h3>
+         <p class="text-gray-600">Jelaskan kegiatan apa saja yang telah kamu lakukan dan apa yang kamu rasakan. Cerita lengkap dan detail membuat jurnal lebih bermakna!</p>
+        </div>
+       </div>
+       <div class="flex gap-4 items-start">
+        <div class="text-4xl">
+         💪
+        </div>
+        <div>
+         <h3 class="text-xl font-bold text-gray-800 mb-2">Semangat Menjalani Ibadah</h3>
+         <p class="text-gray-600">Ramadhan adalah bulan penuh berkah! Niatkan setiap kegiatan dengan ikhlas dan semangat tinggi. Yakin diri bahwa Allah melihat setiap usaha baik kita!</p>
+        </div>
+       </div>
+      </div>
+     </div><button id="start-journal-btn" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg mb-4"> ✨ Mulai Mencatat Kegiatan! </button>
+    </div>
+   </div><!-- Page 3: Activity Selection -->
+   <div id="page-activities" class="min-h-full w-full hidden-page" style="background: linear-gradient(180deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);">
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 shadow-lg sticky top-0 z-20">
+     <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3"><button id="back-from-activities" class="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg></button>
+       <div>
+        <h1 class="title-font text-2xl">Pilih Kegiatan</h1>
+        <p id="current-date-activity" class="text-purple-200 text-sm"></p>
+       </div>
+      </div><button id="logout-btn-activities" class="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+       </svg></button>
+     </div>
+    </header>
+    <div class="max-w-4xl mx-auto px-4 py-8"><!-- Progress Indicator -->
+     <div class="progress-indicator mb-8">
+      <div class="progress-step completed">
+       <div class="progress-step-number">
+        ✓
+       </div><span class="text-xs font-semibold text-gray-600">Aturan</span>
+      </div>
+      <div class="progress-step active">
+       <div class="progress-step-number">
+        2
+       </div><span class="text-xs font-semibold text-purple-600">Pilih Kegiatan</span>
+      </div>
+      <div class="progress-step">
+       <div class="progress-step-number">
+        3
+       </div><span class="text-xs font-semibold text-gray-600">Keterangan</span>
+      </div>
+      <div class="progress-step">
+       <div class="progress-step-number">
+        4
+       </div><span class="text-xs font-semibold text-gray-600">Foto</span>
+      </div>
+     </div>
+     <div class="bg-white rounded-3xl p-8 shadow-xl mb-8">
+      <div class="text-center mb-8">
+       <div class="text-6xl mb-4">
+        🎯
+       </div>
+       <h2 class="text-3xl font-bold text-purple-700 mb-2">Pilih Kegiatan Ramadhan</h2>
+       <p class="text-gray-600">Pilih satu atau lebih kegiatan yang telah kamu lakukan hari ini</p>
+      </div>
+      <div id="activities-selector" class="flex flex-wrap gap-3 justify-center mb-6"><!-- Activity chips will be rendered here -->
+      </div>
+      <div class="bg-purple-50 rounded-xl p-4 mb-6">
+       <p class="text-sm text-gray-700"><span class="font-semibold text-purple-700">Dipilih:</span> <span id="selected-count">0 kegiatan</span></p>
+      </div>
+     </div><button id="next-description-btn" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg mb-4" disabled> ➡️ Lanjut ke Keterangan </button> <button id="back-from-activities" class="btn-secondary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg"> ← Kembali </button>
+    </div>
+   </div><!-- Page 4: Description -->
+   <div id="page-description" class="min-h-full w-full hidden-page" style="background: linear-gradient(180deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);">
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 shadow-lg sticky top-0 z-20">
+     <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div>
+       <h1 class="title-font text-2xl">Keterangan Kegiatan</h1>
+       <p class="text-purple-200 text-sm">Jelaskan apa yang kamu lakukan</p>
+      </div><button id="logout-btn-description" class="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+       </svg></button>
+     </div>
+    </header>
+    <div class="max-w-4xl mx-auto px-4 py-8"><!-- Progress Indicator -->
+     <div class="progress-indicator mb-8">
+      <div class="progress-step completed">
+       <div class="progress-step-number">
+        ✓
+       </div><span class="text-xs font-semibold text-gray-600">Aturan</span>
+      </div>
+      <div class="progress-step completed">
+       <div class="progress-step-number">
+        ✓
+       </div><span class="text-xs font-semibold text-gray-600">Pilih</span>
+      </div>
+      <div class="progress-step active">
+       <div class="progress-step-number">
+        3
+       </div><span class="text-xs font-semibold text-purple-600">Keterangan</span>
+      </div>
+      <div class="progress-step">
+       <div class="progress-step-number">
+        4
+       </div><span class="text-xs font-semibold text-gray-600">Foto</span>
+      </div>
+     </div>
+     <div class="bg-white rounded-3xl p-8 shadow-xl mb-8">
+      <div class="text-center mb-8">
+       <div class="text-6xl mb-4">
+        📝
+       </div>
+       <h2 class="text-3xl font-bold text-purple-700 mb-2">Ceritakan Kegiatan Hari Ini</h2>
+       <p class="text-gray-600">Jelaskan secara detail apa yang telah kamu lakukan</p>
+      </div>
+      <div class="bg-purple-50 rounded-xl p-4 mb-6">
+       <p class="text-sm font-semibold text-purple-700 mb-2">Kegiatan yang dipilih:</p>
+       <p id="selected-activities-display" class="text-gray-700"></p>
+      </div>
+      <form id="description-form" class="space-y-4">
+       <div><label for="activity-description" class="block text-sm font-semibold text-gray-700 mb-2">💭 Jelaskan Kegiatan Kamu</label> <textarea id="activity-description" placeholder="Contoh: Hari ini aku sholat Subuh tepat waktu di masjid bersama Ayah. Kemudian aku tadarus Al-Quran selama 15 menit sambil menunggu waktu berbuka..." class="w-full px-4 py-3 rounded-xl border-2 border-purple-200 focus:border-purple-500 focus:outline-none text-base transition-all resize-none" rows="5" required></textarea>
+        <p class="text-xs text-gray-500 mt-2">Minimal 20 karakter • Maksimal 500 karakter</p>
+       </div>
+      </form>
+     </div><button id="next-photo-btn" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg mb-4" disabled> 📸 Lanjut ke Upload Foto </button> <button onclick="goToPage('activities')" class="btn-secondary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg"> ← Kembali </button>
+    </div>
+   </div><!-- Page 5: Photo Upload -->
+   <div id="page-photo" class="min-h-full w-full hidden-page" style="background: linear-gradient(180deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);">
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 shadow-lg sticky top-0 z-20">
+     <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div>
+       <h1 class="title-font text-2xl">Upload Foto Kegiatan</h1>
+       <p class="text-purple-200 text-sm">Bagikan foto kegiatan Ramadhan kamu</p>
+      </div><button id="logout-btn-photo" class="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+       </svg></button>
+     </div>
+    </header>
+    <div class="max-w-4xl mx-auto px-4 py-8"><!-- Progress Indicator -->
+     <div class="progress-indicator mb-8">
+      <div class="progress-step completed">
+       <div class="progress-step-number">
+        ✓
+       </div><span class="text-xs font-semibold text-gray-600">Aturan</span>
+      </div>
+      <div class="progress-step completed">
+       <div class="progress-step-number">
+        ✓
+       </div><span class="text-xs font-semibold text-gray-600">Pilih</span>
+      </div>
+      <div class="progress-step completed">
+       <div class="progress-step-number">
+        ✓
+       </div><span class="text-xs font-semibold text-gray-600">Ket.</span>
+      </div>
+      <div class="progress-step active">
+       <div class="progress-step-number">
+        4
+       </div><span class="text-xs font-semibold text-purple-600">Foto</span>
+      </div>
+     </div>
+     <div class="bg-white rounded-3xl p-8 shadow-xl mb-8">
+      <div class="text-center mb-8">
+       <div class="text-6xl mb-4">
+        📸
+       </div>
+       <h2 class="text-3xl font-bold text-purple-700 mb-2">Upload Foto Kegiatan</h2>
+       <p class="text-gray-600">Tambahkan foto sebagai bukti kegiatan Ramadhan kamu (Opsional)</p>
+      </div>
+      <div class="photo-upload-area" id="upload-area" onclick="document.getElementById('photo-input').click()">
+       <div class="text-5xl mb-3">
+        📷
+       </div>
+       <p class="text-lg font-semibold text-gray-700 mb-1">Drag foto ke sini atau klik</p>
+       <p class="text-sm text-gray-500">Format: JPG, PNG, WebP | Ukuran maksimal: 5MB</p>
+      </div><input type="file" id="photo-input" class="hidden" accept="image/*">
+      <div id="photo-preview" class="mt-6 hidden">
+       <p class="text-sm font-semibold text-gray-700 mb-3">Foto yang dipilih:</p>
+       <div class="relative inline-block"><img id="preview-image" src="" alt="Preview" class="rounded-xl shadow-lg max-w-xs"> <button type="button" onclick="removePhoto()" class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg"> ✕ </button>
+       </div>
+      </div>
+     </div><button id="submit-journal-btn" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg mb-4" disabled> ✅ Simpan Jurnal Ramadhan </button> <button onclick="goToPage('description')" class="btn-secondary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg"> ← Kembali </button>
+    </div>
+   </div><!-- Success Modal -->
+   <div id="success-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-3xl p-8 max-w-sm mx-4 text-center transform scale-0 transition-transform duration-300">
+     <div class="text-7xl mb-4 bounce-in">
+      🎉
+     </div>
+     <h3 class="text-2xl font-bold text-purple-700 mb-2">Masya Allah!</h3>
+     <p class="text-gray-600 mb-6">Jurnal Ramadhan kamu berhasil disimpan! 📝✨</p><button onclick="resetAndShowRules()" class="btn-primary px-6 py-3 rounded-xl text-white font-bold"> ➕ Isi Hari Berikutnya </button>
+    </div>
+   </div>
+  </div>
+  <script>
+    // Activities reference data
+    const activitiesData = [
+      { id: 'sahur', emoji: '🍚', name: 'Makan Sahur' },
+      { id: 'subuh', emoji: '🌅', name: 'Sholat Subuh' },
+      { id: 'tadarus', emoji: '📖', name: 'Tadarus Al-Quran' },
+      { id: 'dzuhur', emoji: '☀️', name: 'Sholat Dzuhur' },
+      { id: 'ashar', emoji: '🌤️', name: 'Sholat Ashar' },
+      { id: 'sedekah', emoji: '💝', name: 'Berbagi/Sedekah' },
+      { id: 'maghrib', emoji: '🌙', name: 'Sholat Maghrib & Berbuka' },
+      { id: 'isya', emoji: '🌟', name: 'Sholat Isya & Tarawih' }
+    ];
+
+    // App state
+    let currentUser = '';
+    let currentPage = 'login';
+    let formData = {
+      selectedActivities: [],
+      description: '',
+      photo: null
+    };
+    let allJournalData = [];
+
+    // Default config
+    const defaultConfig = {
+      app_title: 'Jurnal Ramadhan Cilik',
+      welcome_message: 'Selamat datang di Jurnal Ramadhan!',
+      background_color: '#fef3c7',
+      primary_color: '#9333ea'
+    };
+
+    // Utility functions
+    function formatDate(date) {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('id-ID', options);
+    }
+
+    function getDateKey(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    function goToPage(page) {
+      // Hide all pages
+      document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+      // Show selected page
+      const pageEl = document.getElementById(`page-${page}`);
+      if (pageEl) {
+        pageEl.classList.remove('hidden');
+        currentPage = page;
+        // Scroll to top
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function showLogout() {
+      currentUser = '';
+      currentPage = 'login';
+      formData = { selectedActivities: [], description: '', photo: null };
+      goToPage('login');
+      localStorage.removeItem('ramadhan_user');
+    }
+
+    function resetAndShowRules() {
+      formData = { selectedActivities: [], description: '', photo: null };
+      document.getElementById('success-modal').classList.add('hidden');
+      goToPage('rules');
+    }
+
+    function showSuccessModal() {
+      const modal = document.getElementById('success-modal');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.querySelector('div').style.transform = 'scale(1)';
+      }, 50);
+    }
+
+    // Photo upload handlers
+    function removePhoto() {
+      formData.photo = null;
+      document.getElementById('photo-preview').classList.add('hidden');
+      document.getElementById('upload-area').classList.remove('hidden');
+      document.getElementById('photo-input').value = '';
+    }
+
+    function handlePhotoSelect(file) {
+      if (file && file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          formData.photo = e.target.result;
+          document.getElementById('preview-image').src = formData.photo;
+          document.getElementById('photo-preview').classList.remove('hidden');
+          document.getElementById('upload-area').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('File harus berupa gambar dengan ukuran maksimal 5MB');
+      }
+    }
+
+    // Activity selection
+    function toggleActivity(activityId) {
+      const idx = formData.selectedActivities.indexOf(activityId);
+      if (idx > -1) {
+        formData.selectedActivities.splice(idx, 1);
+      } else {
+        formData.selectedActivities.push(activityId);
+      }
+      renderActivitySelector();
+      updateActivityDisplay();
+    }
+
+    function renderActivitySelector() {
+      const container = document.getElementById('activities-selector');
+      container.innerHTML = activitiesData.map(activity => {
+        const isSelected = formData.selectedActivities.includes(activity.id);
+        return `
+          <button
+            type="button"
+            class="activity-chip ${isSelected ? 'selected' : ''}"
+            onclick="toggleActivity('${activity.id}')"
+          >
+            ${activity.emoji} ${activity.name}
+          </button>
+        `;
+      }).join('');
+      
+      // Update selected count
+      document.getElementById('selected-count').textContent = `${formData.selectedActivities.length} kegiatan`;
+      
+      // Enable next button if any activity selected
+      document.getElementById('next-description-btn').disabled = formData.selectedActivities.length === 0;
+    }
+
+    function updateActivityDisplay() {
+      const selectedNames = formData.selectedActivities
+        .map(id => activitiesData.find(a => a.id === id)?.name)
+        .filter(Boolean)
+        .join(', ');
+      document.getElementById('selected-activities-display').textContent = selectedNames || 'Belum ada kegiatan yang dipilih';
+    }
+
+    // Data SDK handlers
+    const dataHandler = {
+      onDataChanged(data) {
+        allJournalData = data;
+      }
+    };
+
+    async function saveJournal() {
+      if (formData.selectedActivities.length === 0 || !formData.description.trim()) {
+        alert('Silakan pilih kegiatan dan isi keterangan');
+        return;
+      }
+
+      if (formData.description.length < 20) {
+        alert('Keterangan minimal 20 karakter');
+        return;
+      }
+
+      // Check data limit
+      if (allJournalData.length >= 999) {
+        alert('Batas penyimpanan tercapai');
+        return;
+      }
+
+      const todayDate = getDateKey(new Date());
+      const newEntry = {
+        student_name: currentUser,
+        date: todayDate,
+        selected_activities: formData.selectedActivities.join(','),
+        activity_description: formData.description,
+        activity_photo: formData.photo || '',
+        created_at: new Date().toISOString()
+      };
+
+      const result = await window.dataSdk.create(newEntry);
+      if (result.isOk) {
+        showSuccessModal();
+      } else {
+        alert('Gagal menyimpan. Coba lagi.');
+      }
+    }
+
+    // Config handlers
+    async function onConfigChange(config) {
+      const appTitle = config.app_title || defaultConfig.app_title;
+      const welcomeMsg = config.welcome_message || defaultConfig.welcome_message;
+      
+      const titleEl = document.getElementById('app-title');
+      if (titleEl) titleEl.textContent = appTitle;
+      
+      const welcomeEl = document.getElementById('welcome-msg');
+      if (welcomeEl) welcomeEl.textContent = welcomeMsg;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => { config.background_color = value; window.elementSdk.setConfig({ background_color: value }); }
+          },
+          {
+            get: () => config.primary_color || defaultConfig.primary_color,
+            set: (value) => { config.primary_color = value; window.elementSdk.setConfig({ primary_color: value }); }
+          }
+        ],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['app_title', config.app_title || defaultConfig.app_title],
+        ['welcome_message', config.welcome_message || defaultConfig.welcome_message]
+      ]);
+    }
+
+    // Initialize
+    async function init() {
+      // Initialize Element SDK
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+      }
+
+      // Initialize Data SDK
+      if (window.dataSdk) {
+        const result = await window.dataSdk.init(dataHandler);
+        if (!result.isOk) console.error('Failed to init Data SDK');
+      }
+
+      // Set current date
+      document.getElementById('current-date-activity').textContent = formatDate(new Date());
+
+      // Restore user session
+      const savedUser = localStorage.getItem('ramadhan_user');
+      if (savedUser) {
+        currentUser = savedUser;
+        goToPage('rules');
+      } else {
+        goToPage('login');
+      }
+
+      // Login handler
+      document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('student-name').value.trim();
+        if (name) {
+          currentUser = name;
+          localStorage.setItem('ramadhan_user', name);
+          goToPage('rules');
+        }
+      });
+
+      // Rules page handlers
+      document.getElementById('start-journal-btn').addEventListener('click', () => {
+        renderActivitySelector();
+        goToPage('activities');
+      });
+
+      document.getElementById('back-from-rules').addEventListener('click', () => goToPage('login'));
+
+      // Activities page handlers
+      document.getElementById('next-description-btn').addEventListener('click', () => {
+        updateActivityDisplay();
+        goToPage('description');
+      });
+
+      // Description page handlers
+      const descriptionTA = document.getElementById('activity-description');
+      descriptionTA.addEventListener('input', (e) => {
+        formData.description = e.target.value;
+        const len = e.target.value.length;
+        document.getElementById('next-photo-btn').disabled = len < 20 || len > 500;
+      });
+
+      // Photo upload handlers
+      const uploadArea = document.getElementById('upload-area');
+      const photoInput = document.getElementById('photo-input');
+
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+      });
+
+      uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('drag-over');
+      });
+
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        if (e.dataTransfer.files.length > 0) {
+          handlePhotoSelect(e.dataTransfer.files[0]);
+        }
+      });
+
+      photoInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handlePhotoSelect(e.target.files[0]);
+        }
+      });
+
+      // Submit handler
+      document.getElementById('submit-journal-btn').addEventListener('click', saveJournal);
+
+      // Logout handlers
+      document.getElementById('logout-btn-rules').addEventListener('click', showLogout);
+      document.getElementById('logout-btn-activities').addEventListener('click', showLogout);
+      document.getElementById('logout-btn-description').addEventListener('click', showLogout);
+      document.getElementById('logout-btn-photo').addEventListener('click', showLogout);
+
+      // Back handlers
+      document.getElementById('back-from-activities').addEventListener('click', () => goToPage('rules'));
+    }
+
+    init();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d1260063372df78',t:'MTc3MTYzNjM0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
